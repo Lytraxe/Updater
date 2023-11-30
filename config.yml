@@ -1,0 +1,21 @@
+#- List of paths to the plugins folder of servers
+pluginsPath:
+  - "/path/to/server/plugins"
+  - "../../../relative/path/works/too"
+
+#- Cache directory, this is where the plugins will be downloaded
+#- Plugin jars can also be dropped here and the program will use these jars to update
+#- the servers
+cachePath: "cache"
+
+#- Map of plugins, each entry name must match the plugin name exactly as in `plugin.yml` of that plugin
+plugins:
+  name:
+    #- Source type (github, gitlab, spigot)
+    type: "github"
+    #- Source Value. Depends on the type of source
+    #- For `github` and `gitlab` this should be of form "owner/repository"
+    #- For `spigot` ....
+    value: "Owner/Repository"
+    #- Access token that should be passed if the source is a private repository, if any
+    auth: "null"
