@@ -19,7 +19,7 @@ struct ReleaseInfo {
 struct PluginInfo {
     std::string name;
     std::filesystem::path path;
-    const char* version;
+    std::string version;
     UpdateSource source;
     ReleaseInfo update;
 };

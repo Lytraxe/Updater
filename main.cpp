@@ -1,18 +1,20 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <typeinfo>
 
 #include "include/utils/curl_utils.h"
 #include "include/api_wrapper/github_api.h"
 #include "include/types.h"
+#include "include/cache.h"
 #include "include/utils/file_utils.h"
 #include "include/utils/zip_utils.h"
 #include "include/utils/yaml_utils.h"
 
-std::vector<std::string> pluginsPath;
-std::vector<std::unordered_map<std::string, PluginInfo>> servers;
-std::string cachePath;
-std::unordered_map<std::string, PluginInfo> cache;
+std::vector<std::string> pluginsPath {};
+std::vector<std::unordered_map<std::string, PluginInfo>> servers {};
+std::string cachePath {};
+std::unordered_map<std::string, PluginInfo> cache {};
 
 void loadConfig() {
 	try {
@@ -27,7 +29,7 @@ void loadConfig() {
 
 		if (!config["cachePath"]) {
 			std::cerr << "Could not find cachePath in config.yml\n";
-			return; 
+			return;
 		}
 		cachePath = config["cachePath"].as<std::string>();
 
@@ -58,17 +60,26 @@ void init() {
 		std::cerr << "Could not create the cache directory.. Aborting..\n";
 		std::exit(1);
 	}
+
+	readPlugins(cachePath, cache);
+
+	for (auto& path : pluginsPath) {
+		if (!std::filesystem::exists(path)) {
+			std::cerr << "Path " << path << " does not exist. skipping..\n";
+			continue;
+		}
+
+		std::unordered_map<std::string, PluginInfo> map{};
+		readPlugins(path, map);
+		servers.push_back(map);
+	}
 }
 
 int main() {
 	init();
 
 	for (const auto& pl : cache) {
-		std::cout << pl.first << '\n'
-			<< pl.second.name << '\n' << pl.second.source.type << '\n'
-			<< pl.second.source.value << '\n'
-			<< pl.second.source.auth << '\n';
-	 }
+		std::cout << pl.first << " " << pl.second.path << " " << pl.second.version << '\n';
+	}
 	return 0;
-
 }

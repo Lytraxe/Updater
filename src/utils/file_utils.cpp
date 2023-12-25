@@ -1,4 +1,5 @@
 #include "../../include/utils/file_utils.h"
+#include <iostream>
 
 std::error_code renameFile(std::string& from, std::string& to) {
     std::error_code err;
