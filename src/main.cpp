@@ -3,13 +3,13 @@
 #include <unordered_map>
 #include <typeinfo>
 
-#include "include/utils/curl_utils.h"
-#include "include/api_wrapper/github_api.h"
-#include "include/types.h"
-#include "include/cache.h"
-#include "include/utils/file_utils.h"
-#include "include/utils/zip_utils.h"
-#include "include/utils/yaml_utils.h"
+#include "../include/utils/curl_utils.h"
+#include "../include/api_wrapper/github_api.h"
+#include "../include/types.h"
+#include "../include/cache.h"
+#include "../include/utils/file_utils.h"
+#include "../include/utils/zip_utils.h"
+#include "../include/utils/yaml_utils.h"
 
 std::vector<std::string> pluginsPath {};
 std::vector<std::unordered_map<std::string, PluginInfo>> servers {};
