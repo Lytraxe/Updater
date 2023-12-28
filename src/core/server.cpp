@@ -3,10 +3,7 @@
 
 #include <iostream>
 
-Server::Server(std::string& name, std::string& dir) {
-    this->_name = name;
-    this->_directory = dir;
-
+Server::Server(const std::string& name, const std::string& dir) : _name{ name }, _directory{ dir } {
     refresh();
 }
 
@@ -17,6 +14,10 @@ void Server::refresh() {
     readPlugins(this->_directory, mapRef);
 }
 
-bool Server::contains(std::string& name) {
+bool Server::contains(const std::string& name) const {
     return this->_localPlugins.contains(name);
+}
+
+const std::string& Server::directory() const {
+    return this->_directory;
 }

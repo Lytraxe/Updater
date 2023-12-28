@@ -12,7 +12,8 @@ private:
     std::unordered_map<std::string, PluginInfo> _localPlugins{};
 
 public:
-    Server(std::string& name, std::string& dir);
+    Server(const std::string& name, const std::string& dir);
     void refresh();
-    bool contains(std::string& name);
+    bool contains(const std::string& name) const;
+    const std::string& directory() const;
 };
