@@ -7,31 +7,33 @@
 #include "../include/api_wrapper/github_api.h"
 #include "../include/types.h"
 #include "../include/cache.h"
+#include "../include/server.h"
 #include "../include/utils/file_utils.h"
 #include "../include/utils/zip_utils.h"
 #include "../include/utils/yaml_utils.h"
 
-std::vector<std::string> pluginsPath {};
-std::vector<std::unordered_map<std::string, PluginInfo>> servers {};
-std::string cachePath {};
-std::unordered_map<std::string, PluginInfo> cache {};
+std::vector<Server> servers{};
+std::string cachePath{};
+std::unordered_map<std::string, PluginInfo> cache{};
 
 void loadConfig() {
 	try {
 		YAML::Node config = YAML::LoadFile("config.yml");
-		if (!config["pluginsPath"]) {
-			std::cerr << "Could not find pluginsPath in config.yml\n";
-			return;
-		}
-		for (const auto& dir : config["pluginsPath"]) {
-			pluginsPath.push_back(dir.as<std::string>());
-		}
 
 		if (!config["cachePath"]) {
 			std::cerr << "Could not find cachePath in config.yml\n";
 			return;
 		}
 		cachePath = config["cachePath"].as<std::string>();
+
+		if (!config["servers"]) {
+			std::cerr << "Could not find servers node in config.yml\n";
+			return;
+		}
+
+		for (const auto& server: config["servers"]) {
+			servers.push_back(Server{server.first.as<std::string>(), server.second.as<std::string>()});
+		}
 
 		if (!config["plugins"]) {
 			std::cerr << "Could not find plugins node in config.yml\n";
@@ -63,15 +65,11 @@ void init() {
 
 	readPlugins(cachePath, cache);
 
-	for (auto& path : pluginsPath) {
-		if (!std::filesystem::exists(path)) {
-			std::cerr << "Path " << path << " does not exist. skipping..\n";
+	for (auto& server : servers) {
+		if (!std::filesystem::exists(server.directory())) {
+			std::cerr << "Path " << server.directory() << " does not exist. skipping..\n";
 			continue;
 		}
-
-		std::unordered_map<std::string, PluginInfo> map{};
-		readPlugins(path, map);
-		servers.push_back(map);
 	}
 }
 

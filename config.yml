@@ -1,12 +1,13 @@
-#- List of paths to the plugins folder of servers
-pluginsPath:
-  - "/path/to/server/plugins"
-  - "../../../relative/path/works/too"
-
 #- Cache directory, this is where the plugins will be downloaded
 #- Plugin jars can also be dropped here and the program will use these jars to update
 #- the servers
 cachePath: "cache"
+
+#- List of servers
+servers:
+  #- name: pluginsPath
+  server1: "../../path/to/plugins"
+  server2: "/path/to/plugins"
 
 #- Map of plugins, each entry name must match the plugin name exactly as in `plugin.yml` of that plugin
 plugins:
