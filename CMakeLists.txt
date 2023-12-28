@@ -16,11 +16,17 @@ find_package(yaml-cpp REQUIRED)
 # this one requires some weird shenanigans
 find_package(libzip REQUIRED)
 
+get_target_property(JSON_INC_PATH jsoncpp_lib INTERFACE_INCLUDE_DIRECTORIES)
+include_directories(${JSON_INC_PATH})
+
 # Probably useless
-target_include_directories(updater PRIVATE include)
+include_directories(updater PRIVATE include)
+
+include_directories(${YAML_CPP_INCLUDE_DIRS})
+include_directories(${ZIP_INCLUDE_DIRS})
 
 # Link
 target_link_libraries(updater PRIVATE CURL::libcurl)
-target_link_libraries(updater PRIVATE yaml-cpp)
-target_link_libraries(updater PRIVATE jsoncpp)
+target_link_libraries(updater PRIVATE jsoncpp_lib)
+target_link_libraries(updater PRIVATE ${YAML_CPP_LIBRARIES})
 target_link_libraries(updater PRIVATE zip)
