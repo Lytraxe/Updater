@@ -1,5 +1,4 @@
-#ifndef JSON_UTILS
-#define JSON_UTILS
+#pragma once
 
 #include <json/json.h>
 
@@ -19,5 +18,3 @@ public:
     int getInt(const char* name);
     bool getBool(const char* name);
 };
-
-#endif

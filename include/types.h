@@ -1,5 +1,4 @@
-#ifndef TYPES_H
-#define TYPES_H
+#pragma once
 
 #include <string>
 #include <filesystem>
@@ -23,5 +22,3 @@ struct PluginInfo {
     UpdateSource source;
     ReleaseInfo update;
 };
-
-#endif

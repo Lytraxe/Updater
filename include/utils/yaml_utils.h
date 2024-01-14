@@ -1,9 +1,3 @@
-#ifndef YAML_UTILS_H
-#define YAML_UTILS_H
+#pragma once
 
 #include <yaml-cpp/yaml.h>
-
-
-
-
-#endif

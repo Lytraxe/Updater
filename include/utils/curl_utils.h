@@ -1,5 +1,4 @@
-#ifndef CURL_UTILS
-#define CURL_UTILS
+#pragma once
 
 #include <curl/curl.h>
 #include "json_utils.h"
@@ -22,5 +21,3 @@ long getJsonResponse(request_t& req, JsonParser& res);
 
 size_t handleOutput(char* ptr, size_t size, size_t nmemb, void* userd);
 size_t writeCallback(char* ptr, size_t size, size_t nmemb, void* userd);
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef GITHUB_API
-#define GITHUB_API
+#pragma once
 
 #include <string>
 #include "../types.h"
@@ -18,5 +17,3 @@ public:
 private:
     std::string releasesUrl;
 };
-
-#endif
