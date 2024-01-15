@@ -4,6 +4,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 class Server {
 private:
@@ -14,6 +15,10 @@ private:
 public:
     Server(const std::string& name, const std::string& dir);
     void refresh();
+    bool stage(const PluginInfo& plugin);
+    const PluginInfo& get(const std::string& name);
     bool contains(const std::string& name) const;
     const std::string& directory() const;
+    void summary() const;
+    bool update() const;
 };

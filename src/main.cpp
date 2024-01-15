@@ -31,8 +31,8 @@ void loadConfig() {
 			return;
 		}
 
-		for (const auto& server: config["servers"]) {
-			servers.push_back(Server{server.first.as<std::string>(), server.second.as<std::string>()});
+		for (const auto& server : config["servers"]) {
+			servers.push_back(Server{ server.first.as<std::string>(), server.second.as<std::string>() });
 		}
 
 		if (!config["plugins"]) {
@@ -63,21 +63,31 @@ void init() {
 		std::exit(1);
 	}
 
+	//- Read cache
 	readPlugins(cachePath, cache);
-
-	for (auto& server : servers) {
-		if (!std::filesystem::exists(server.directory())) {
-			std::cerr << "Path " << server.directory() << " does not exist. skipping..\n";
-			continue;
-		}
-	}
 }
 
 int main() {
 	init();
 
-	for (const auto& pl : cache) {
-		std::cout << pl.first << " " << pl.second.path << " " << pl.second.version << '\n';
+	//- Go through servers and look for updated plugins
+
+	for (auto& server : servers) {
+		for (const auto& itr : cache) {
+			//- Check if the cached plugin is in server, if yes then check if its the same version
+			//- assuming the cache is always the up-to-date version
+			if (!server.contains(itr.first)) continue;
+			if (server.get(itr.first).version == itr.second.version) continue;
+			server.stage(itr.second);
+		}
 	}
+
+	//- Show a summary first
+	for (const auto& server : servers) server.summary();
+
+	//- Ask for confirmation
+
+	//- Update
+
 	return 0;
 }

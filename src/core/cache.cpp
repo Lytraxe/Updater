@@ -10,7 +10,7 @@ void readPlugins(std::string& pluginPath, std::unordered_map<std::string, Plugin
 
     auto err = getFiles(pluginPath, jars);
     if (err) {
-        std::cerr << "Error occured when reading files at " << pluginPath << " (" + err.message() + ")\n";
+        std::cerr << "Error occured while reading files at " << pluginPath << " (" + err.message() + ")\n";
         return;
     }
 
