@@ -8,6 +8,7 @@
 #include "../include/types.h"
 #include "../include/cache.h"
 #include "../include/server.h"
+#include "../include/user_interface/input.h"
 #include "../include/utils/file_utils.h"
 #include "../include/utils/zip_utils.h"
 #include "../include/utils/yaml_utils.h"
@@ -58,8 +59,8 @@ void loadConfig() {
 void init() {
 	loadConfig();
 
-	if (!std::filesystem::exists(cachePath) && !std::filesystem::create_directories(cachePath)) {
-		std::cerr << "Could not create the cache directory.. Aborting..\n";
+	if (std::error_code e{}; !std::filesystem::exists(cachePath) && !std::filesystem::create_directories(cachePath, e)) {
+		std::cerr << "Could not create the cache directory: " << e.message() << "\nAborting..\n";
 		std::exit(1);
 	}
 
@@ -69,6 +70,8 @@ void init() {
 
 int main() {
 	init();
+
+	//- TODO: Better responses
 
 	//- Go through servers and look for updated plugins
 
@@ -86,8 +89,20 @@ int main() {
 	for (const auto& server : servers) server.summary();
 
 	//- Ask for confirmation
+	if (std::cout << "Do you wish to continue? (y/n): "; input::get<char>() != 'y') {
+		std::cout << "Aborting..\n";
+		exit(0);
+	}
 
 	//- Update
+	for (const auto& server : servers) {
+		std::cout << "Updating " << server.name() << "...\n";
+		if (!server.update()) {
+			std::cerr << "Could not update " << server.name() << '\n';
+		}
+		else { std::cout << "Finished updating " << server.name() << '\n'; }
+	}
 
+	std::cout << "Done. Please restart the server(s) for the update to take effect.\n";
 	return 0;
 }

@@ -8,8 +8,8 @@
 
 class Server {
 private:
-    std::string _directory{};
     std::string _name{};
+    std::string _directory{};
     std::unordered_map<std::string, PluginInfo> _localPlugins{};
 
 public:
@@ -18,6 +18,7 @@ public:
     bool stage(const PluginInfo& plugin);
     const PluginInfo& get(const std::string& name);
     bool contains(const std::string& name) const;
+    const std::string& name() const;
     const std::string& directory() const;
     void summary() const;
     bool update() const;

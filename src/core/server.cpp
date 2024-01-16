@@ -1,5 +1,6 @@
 #include "../../include/server.h"
 #include "../../include/cache.h"
+#include "../../include/utils/file_utils.h"
 
 #include <iostream>
 
@@ -25,8 +26,12 @@ const PluginInfo& Server::get(const std::string& name) {
 bool Server::stage(const PluginInfo& plugin) {
     if (!contains(plugin.name)) return false;
     this->_localPlugins[plugin.name].staged = true;
-    this->_localPlugins[plugin.name].update = { plugin.version, plugin.path };
+    this->_localPlugins[plugin.name].update = { plugin.version, plugin.path, plugin.path.filename() };
     return true;
+}
+
+const std::string& Server::name() const {
+    return this->_name;
 }
 
 const std::string& Server::directory() const {
@@ -46,4 +51,25 @@ void Server::summary() const {
         ++staged;
     }
     std::cout << staged << " out of " << this->_localPlugins.size() << " plugins staged for update\n";
+}
+
+bool Server::update() const {
+    const std::filesystem::path updatePath{ std::filesystem::path{this->_directory}.append("update") };
+    if (std::error_code er{}; !std::filesystem::exists(updatePath)
+        && !std::filesystem::create_directories(updatePath, er)) {
+
+        std::cerr << "\tCould not create directory " << updatePath << ": " << er.message() << '\n';
+        return false;
+    }
+
+    for (const auto& itr : this->_localPlugins) {
+        const auto& plugin = itr.second;
+        if (!plugin.staged) continue;
+        
+        if (const auto err = copyFile(plugin.update.filePath, std::filesystem::path{updatePath}.append(plugin.update.fileName))) {
+            std::cerr << "\tCould not copy `" << plugin.name << "` to " << updatePath << ": " << err.message() << ". skipping..\n";
+            continue;
+        }
+    }
+    return true;
 }

@@ -17,7 +17,7 @@ std::string GitHubApi::getLatestVersion() {
 
 void GitHubApi::fetchRelease() {
     JsonParser parser;
-    request_t req{ 0 };
+    request_t req{};
     req.url = releasesUrl.c_str();
 
     short res = getJsonResponse(req, parser);
