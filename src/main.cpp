@@ -32,6 +32,7 @@ void loadConfig() {
 			return;
 		}
 
+		std::cout << "|Loading servers\n";
 		for (const auto& server : config["servers"]) {
 			servers.push_back(Server{ server.first.as<std::string>(), server.second.as<std::string>() });
 		}
@@ -64,8 +65,16 @@ void init() {
 		std::exit(1);
 	}
 
+	std::cout << "|Loading cache\n";
 	//- Read cache
 	readPlugins(cachePath, cache);
+
+	std::cout << "|Fetching updates\n";
+	for (auto& itr : cache) {
+		if (!itr.second.source) continue;
+		//- TODO: checks around here in case the update fails
+		checkAndDownload(itr.second, cachePath);
+	}
 }
 
 int main() {
@@ -74,18 +83,18 @@ int main() {
 	//- TODO: Better responses
 
 	//- Go through servers and look for updated plugins
-
 	for (auto& server : servers) {
-		for (const auto& itr : cache) {
+		for (const auto& cached : cache) {
 			//- Check if the cached plugin is in server, if yes then check if its the same version
 			//- assuming the cache is always the up-to-date version
-			if (!server.contains(itr.first)) continue;
-			if (server.get(itr.first).version == itr.second.version) continue;
-			server.stage(itr.second);
+			if (!server.contains(cached.first)) continue;
+			if (server.get(cached.first).version == cached.second.version) continue;
+			server.stage(cached.second);
 		}
 	}
 
 	//- Show a summary first
+	std::cout << "|Summary\n";
 	for (const auto& server : servers) server.summary();
 
 	//- Ask for confirmation
@@ -96,11 +105,10 @@ int main() {
 
 	//- Update
 	for (const auto& server : servers) {
-		std::cout << "Updating " << server.name() << "...\n";
+		std::cout << "|Updating " << server.name() << '\n';
 		if (!server.update()) {
 			std::cerr << "Could not update " << server.name() << '\n';
 		}
-		else { std::cout << "Finished updating " << server.name() << '\n'; }
 	}
 
 	std::cout << "Done. Please restart the server(s) for the update to take effect.\n";
