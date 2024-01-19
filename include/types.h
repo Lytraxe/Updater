@@ -7,6 +7,10 @@ struct UpdateSource {
     std::string type{};
     std::string value{};
     std::string auth{};
+
+    operator bool() {
+        return !type.empty();
+    }
 };
 
 struct ReleaseInfo {
