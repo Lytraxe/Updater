@@ -1,10 +1,12 @@
 #include "../../include/utils/curl_utils.h"
+#include "../../include/user_interface/output.h"
 #include <iostream>
 #include <fstream>
 
-size_t handleOutput(char* ptr, size_t size, size_t nmemb, void* userd) {
-    *(std::ofstream*)userd << ptr;
-    return size * nmemb;
+int progress_callback(void* ptr, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
+    float progress = (dltotal != 0 ? dlnow / (float)dltotal : 0);
+    ((output::ProgressBar*)ptr)->update(progress);
+    return 0;
 }
 
 size_t writeCallback(char* ptr, size_t size, size_t nmemb, void* userd) {
@@ -17,18 +19,23 @@ short downloadFile(request_t* req, response_t* res) {
     CURL* handler;
 
     if ((handler = curl_easy_init())) {
-        std::ofstream fout(req->path);
+        FILE* fout = fopen(req->path.c_str(), "wb");
 
-        if (!fout.is_open()) {
+        if (!fout) {
             std::cerr << "Could not write to file " << req->path << '\n';
             return 1;
         }
 
-        curl_easy_setopt(handler, CURLOPT_URL, req->url);
-        curl_easy_setopt(handler, CURLOPT_WRITEDATA, &fout);
-        curl_easy_setopt(handler, CURLOPT_WRITEFUNCTION, handleOutput);
+        output::ProgressBar bar{ req->path.filename() };
+        curl_easy_setopt(handler, CURLOPT_URL, req->url.c_str());
+        curl_easy_setopt(handler, CURLOPT_WRITEDATA, fout);
+        curl_easy_setopt(handler, CURLOPT_FOLLOWLOCATION, 1);
+        curl_easy_setopt(handler, CURLOPT_NOPROGRESS, 0);
+        curl_easy_setopt(handler, CURLOPT_XFERINFODATA, &bar);
+        curl_easy_setopt(handler, CURLOPT_XFERINFOFUNCTION, progress_callback);
+
         if (req->headers)
-            curl_easy_setopt(handler, CURLOPT_HEADER, req->headers);
+            curl_easy_setopt(handler, CURLOPT_HTTPHEADER, req->headers);
 
         res->curl_code = curl_easy_perform(handler);
 
@@ -41,7 +48,8 @@ short downloadFile(request_t* req, response_t* res) {
         curl_easy_cleanup(handler);
         if (req->headers)
             curl_slist_free_all(req->headers);
-        fout.close();
+        //fout.close();
+        fclose(fout);
     }
     return 0;
 }
@@ -58,7 +66,7 @@ long getJsonResponse(request_t& req, JsonParser& res) {
 
     if ((handler = curl_easy_init())) {
         std::string out;
-        curl_easy_setopt(handler, CURLOPT_URL, req.url);
+        curl_easy_setopt(handler, CURLOPT_URL, req.url.c_str());
         curl_easy_setopt(handler, CURLOPT_WRITEDATA, (void*)&out);
         curl_easy_setopt(handler, CURLOPT_WRITEFUNCTION, writeCallback);
         req.headers = curl_slist_append(req.headers, "Accept: application/json");
@@ -71,7 +79,8 @@ long getJsonResponse(request_t& req, JsonParser& res) {
             if (val == 200) {
                 val = 0;
                 res.init(out.c_str());
-            } else val *= -1;
+            }
+            else val *= -1;
         }
         else val = ccode;
         curl_easy_cleanup(handler);
