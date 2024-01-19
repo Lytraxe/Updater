@@ -5,15 +5,14 @@
 
 class GitHubApi {
 public:
-    std::string owner;
-    std::string repo;
-    ReleaseInfo release;
+    std::string _repo;
+    ReleaseInfo _release;
 
-    GitHubApi(const char* owner, const char* repo);
+    GitHubApi(const std::string& repo);
 
     void fetchRelease();
-    std::string getLatestVersion();
+    const std::string& getLatestVersion();
 
 private:
-    std::string releasesUrl;
+    std::string _releasesUrl;
 };
