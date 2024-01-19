@@ -18,6 +18,8 @@ namespace output {
       bool _showpercent{ true };
       std::string _prefix{};
 
+      bool _finished{ false };
+
    public:
       ProgressBar() {}
       ProgressBar(const std::string& prefix) : _prefix{ prefix } {}
@@ -26,6 +28,7 @@ namespace output {
       }
 
       void update(float progress) {
+         if (_finished) return;
          int filledWidth = static_cast<int>(progress * _width);
 
          std::cout << _prefix << _begin;
@@ -37,10 +40,17 @@ namespace output {
                std::cout << ' ';
          }
          std::cout << _end << ' ';
-         if (_showpercent) std::cout << int(progress * 100.0) << "%";
-         if (int(progress * 100.0) == 100) std::cout << '\n';
-         else std::cout << '\r';
+         if (_showpercent) std::cout << int(progress * 100.0) << '%';
+         std::cout << '\r';
          std::cout.flush();
+      }
+
+      void finish() {
+         if (_finished) return;
+         //- Call update for the last time
+         update(1);
+         std::cout << '\n';
+         _finished = true;
       }
    };
 }

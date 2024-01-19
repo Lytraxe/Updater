@@ -4,8 +4,10 @@
 #include <fstream>
 
 int progress_callback(void* ptr, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
-    float progress = (dltotal != 0 ? dlnow / (float)dltotal : 0);
-    ((output::ProgressBar*)ptr)->update(progress);
+    bool begin{ dltotal != 0 };
+    float progress = (begin ? dlnow / (float)dltotal : 0);
+    if (dlnow == dltotal && begin) ((output::ProgressBar*)ptr)->finish();
+    else ((output::ProgressBar*)ptr)->update(progress);
     return 0;
 }
 
@@ -26,7 +28,7 @@ short downloadFile(request_t* req, response_t* res) {
             return 1;
         }
 
-        output::ProgressBar bar{ req->path.filename() };
+        output::ProgressBar bar{ req->path.filename().string() + " " };
         curl_easy_setopt(handler, CURLOPT_URL, req->url.c_str());
         curl_easy_setopt(handler, CURLOPT_WRITEDATA, fout);
         curl_easy_setopt(handler, CURLOPT_FOLLOWLOCATION, 1);
