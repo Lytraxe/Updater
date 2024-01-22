@@ -1,4 +1,4 @@
-#include "../../include/cache.h"
+#include "../../include/core/cache.h"
 #include "../../include/utils/file_utils.h"
 #include "../../include/utils/curl_utils.h"
 #include "../../include/utils/zip_utils.h"
