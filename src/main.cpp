@@ -3,7 +3,6 @@
 #include <unordered_map>
 #include <typeinfo>
 
-#include "../include/utils/curl_utils.h"
 #include "../include/api_wrapper/github_api.h"
 #include "../include/types.h"
 #include "../include/core/cache.h"

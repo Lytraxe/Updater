@@ -4,13 +4,9 @@
 
 class JsonParser {
 public:
-    Json::Value jsonData;
+    Json::Value jsonData{};
 
-    JsonParser();
-    JsonParser(char* data);
     JsonParser(std::string& data);
-
-    void init(const char* data);
 
     Json::Value get(const char* name);
     void set(Json::Value& value);
