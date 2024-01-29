@@ -1,5 +1,5 @@
-#include "../../include/utils/curl.h"
-#include "../../include/user_interface/output.h"
+#include <include/utils/curl.h>
+#include <include/user_interface/output.h>
 
 int progress_callback(void* ptr, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
     bool begin{ dltotal != 0 };

@@ -3,6 +3,14 @@
 #include <iostream>
 
 namespace output {
+   constexpr struct {
+      const char* RED_FORE = "";
+      const char* GREEN_FORE = "";
+      const char* BLUE_FORE = "";
+      const char* YELLOW_FORE = "\x1b[33m";
+      const char* PINK_FORE = "\x1b[35m";
+      const char* RED_BACK = "";
+   } Escape;
 
    template<typename T> inline void print(const T& val) {
       std::cout << val;

@@ -1,6 +1,7 @@
-#include "../../include/api_wrapper/github_api.h"
-#include "../../include/utils/curl.h"
-#include "../../include/utils/json_utils.h"
+#include <include/api_wrapper/github_api.h>
+#include <include/utils/curl.h>
+#include <include/utils/json_utils.h>
+
 #include <iostream>
 
 GitHubApi::GitHubApi(const std::string& repo) : _repo{ repo } {

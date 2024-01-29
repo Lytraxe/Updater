@@ -23,6 +23,8 @@ file(GLOB_RECURSE SOURCES "src/*.cpp")
 
 add_executable(updater ${SOURCES})
 
+include_directories(include)
+
 # Link libraries
 find_package(CURL REQUIRED)
 find_package(jsoncpp REQUIRED)
@@ -33,9 +35,6 @@ find_package(libzip REQUIRED)
 
 get_target_property(JSON_INC_PATH jsoncpp_lib INTERFACE_INCLUDE_DIRECTORIES)
 include_directories(${JSON_INC_PATH})
-
-# Probably useless
-include_directories(updater PRIVATE include)
 
 include_directories(${YAML_CPP_INCLUDE_DIRS})
 include_directories(${ZIP_INCLUDE_DIRS})

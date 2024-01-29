@@ -1,4 +1,4 @@
-#include "../../include/utils/zip_utils.h"
+#include <include/utils/zip_utils.h>
 #include <iostream>
 
 short readFromJar(const char* jarPath, const char* file, std::string& output) {

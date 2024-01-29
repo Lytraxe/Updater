@@ -1,4 +1,4 @@
-#include "../../include/utils/json_utils.h"
+#include <include/utils/json_utils.h>
 
 JsonParser::JsonParser(std::string& data) {
     Json::CharReaderBuilder reader;

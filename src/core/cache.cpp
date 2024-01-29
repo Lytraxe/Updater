@@ -1,9 +1,9 @@
-#include "../../include/core/cache.h"
-#include "../../include/utils/file_utils.h"
-#include "../../include/utils/zip_utils.h"
-#include "../../include/utils/curl.h"
-#include "../../include/utils/yaml_utils.h"
-#include "../../include/api_wrapper/github_api.h"
+#include <include/core/cache.h>
+#include <include/utils/file_utils.h>
+#include <include/utils/zip_utils.h>
+#include <include/utils/curl.h>
+#include <include/utils/yaml_utils.h>
+#include <include/api_wrapper/github_api.h>
 
 #include <iostream>
 

@@ -1,6 +1,6 @@
-#include "../../include/core/server.h"
-#include "../../include/core/cache.h"
-#include "../../include/utils/file_utils.h"
+#include <include/core/server.h>
+#include <include/core/cache.h>
+#include <include/utils/file_utils.h>
 
 #include <iostream>
 

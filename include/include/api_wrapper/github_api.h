@@ -1,7 +1,8 @@
 #pragma once
 
+#include <include/types.h>
+
 #include <string>
-#include "../types.h"
 
 class GitHubApi {
 public:
