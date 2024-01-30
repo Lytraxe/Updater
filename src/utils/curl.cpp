@@ -1,7 +1,7 @@
 #include <include/utils/curl.h>
 #include <include/user_interface/output.h>
 
-int progress_callback(void* ptr, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
+int progress_callback(void* ptr, curl_off_t dltotal, curl_off_t dlnow, curl_off_t, curl_off_t) {
     bool begin{ dltotal != 0 };
     float progress = (begin ? dlnow / (float)dltotal : 0);
     if (dlnow == dltotal && begin) ((output::ProgressBar*)ptr)->finish();

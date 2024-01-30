@@ -4,6 +4,7 @@
 #include <include/utils/curl.h>
 #include <include/utils/yaml_utils.h>
 #include <include/api_wrapper/github_api.h>
+#include <include/api_wrapper/wrapper.h>
 
 #include <iostream>
 
@@ -47,42 +48,20 @@ void readPlugins(std::string& pluginPath, std::unordered_map<std::string, Plugin
     }
 }
 
-//- TODO move this to a class and make the wrappers inherit it
-
-bool download(const std::string& url, const std::filesystem::path& path) {
-    Request req{ url, path };
-    req.header("Accept: application/vnd.github+json");
-    req.header("User-Agent: Lytraxe/updater");
-
-    Result res{};
-
-    CurlWrapper wrapper{ &req, &res };
-    if (wrapper.failed()) {
-        return false;
-    }
-    wrapper.download(true);
-    if (res._curlCode == 0) {
-        if (res._httpRes == 200 || res._httpRes == 201 || res._httpRes == 202) {
-            return true;
-        }
-
-        std::cerr << "Received non OK http response: " << res._httpRes << '\n';
-        return false;
-    }
-    std::cerr << "Received non OK curl code (" << res._curlCode << "): " << curl_easy_strerror(res._curlCode) << '\n';
-    return false;
-}
-
 bool checkAndDownload(PluginInfo& plugin, const std::string& cachePath) {
     auto& source = plugin.source;
 
     if (source.type == "github") {
-        auto wrapper = GitHubApi(source.value);
-        if (plugin.version == wrapper.getLatestVersion()) return false;
-        auto path{ std::filesystem::path{cachePath}.append(wrapper._release.fileName) };
-        std::cout << "Downloading " << wrapper._release.tag << " from " << wrapper._release.fileDownloadUrl << '\n';
-        if (download(wrapper._release.fileDownloadUrl, path)) {
-            plugin.version = wrapper.getLatestVersion();
+        auto wrapper = GitHubApi(source.value, source.auth);
+        const auto& version{ wrapper.getLatestVersion() };
+
+        if (version.empty() || plugin.version == version) return false;
+
+        auto path{ std::filesystem::path{cachePath}.append(wrapper.getRelease().fileName) };
+        //std::cout << "Downloading " << wrapper.getRelease().tag << " from " << wrapper.getRelease().fileDownloadUrl << '\n';
+
+        if (wrapper.download(path)) {
+            plugin.version = version;
             plugin.path = path;
             return true;
         }

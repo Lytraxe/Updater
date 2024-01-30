@@ -18,7 +18,7 @@ struct Request {
     std::filesystem::path _filePath{};
     curl_slist* _headers{ nullptr };
 
-    void header(const char* value) { curl_slist_append(_headers, value); }
+    void header(const std::string& value) { _headers = curl_slist_append(_headers, value.c_str()); }
 };
 
 class CurlWrapper {

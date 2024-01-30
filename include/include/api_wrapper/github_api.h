@@ -1,19 +1,17 @@
 #pragma once
 
 #include <include/types.h>
+#include <include/api_wrapper/wrapper.h>
 
 #include <string>
 
-class GitHubApi {
-public:
-    std::string _repo;
-    ReleaseInfo _release;
-
-    GitHubApi(const std::string& repo);
-
-    void fetchRelease();
-    const std::string& getLatestVersion();
-
+class GitHubApi : public Wrapper {
 private:
-    std::string _releasesUrl;
+    std::string _auth{};
+
+public:
+    GitHubApi(const std::string& repo, const std::string& auth = "");
+
+    void parse(Result& result);
+    void applyHeaders(Request& req);
 };
