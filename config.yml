@@ -18,5 +18,6 @@ plugins:
     #- For `github` and `gitlab` this should be of form "owner/repository"
     #- For `spigot` ....
     value: "Owner/Repository"
-    #- Access token that should be passed if the source is a private repository, if any
-    auth: "null"
+    #- Access token that should be passed if the source is a private repository, if any.
+    #- Leave it empty if you don't know what this is.
+    auth: ""
