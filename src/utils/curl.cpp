@@ -33,6 +33,7 @@ CurlWrapper::CurlWrapper(Request* req, Result* res) : _req{ req }, _res{ res } {
 }
 
 void CurlWrapper::clean() {
+    delete _bar;
     if (_curl) {
         curl_easy_cleanup(_curl);
         _curl = nullptr;
@@ -54,10 +55,15 @@ void CurlWrapper::download(bool progressBar = false) {
     curl_easy_setopt(_curl, CURLOPT_WRITEDATA, _file);
     curl_easy_setopt(_curl, CURLOPT_FOLLOWLOCATION, 1);
 
+
     if (progressBar) {
-        output::ProgressBar bar{ _req->_filePath.filename().string() + " " };
+        if (_bar) {
+            delete _bar;
+            _bar = new output::ProgressBar{ _req->_filePath.filename().string().append(" ") };
+        }
+        else _bar = new output::ProgressBar{ _req->_filePath.filename().string().append(" ") };
         curl_easy_setopt(_curl, CURLOPT_NOPROGRESS, 0);
-        curl_easy_setopt(_curl, CURLOPT_XFERINFODATA, &bar);
+        curl_easy_setopt(_curl, CURLOPT_XFERINFODATA, _bar);
         curl_easy_setopt(_curl, CURLOPT_XFERINFOFUNCTION, progress_callback);
     }
 

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <filesystem>
 #include <curl/curl.h>
+#include <include/user_interface/output.h>
 
 struct Result {
     CURLcode _curlCode{};
@@ -27,6 +28,7 @@ private:
     Result* _res{ nullptr };
     CURL* _curl{ nullptr };
     FILE* _file{ nullptr };
+    output::ProgressBar* _bar{ nullptr };
     bool _fail{ false };
 
 public:

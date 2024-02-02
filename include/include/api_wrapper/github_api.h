@@ -1,6 +1,5 @@
 #pragma once
 
-#include <include/types.h>
 #include <include/api_wrapper/wrapper.h>
 
 #include <string>
