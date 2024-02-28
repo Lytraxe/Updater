@@ -8,6 +8,7 @@
 #include <include/core/cache.h>
 #include <include/core/server.h>
 #include <include/user_interface/input.h>
+#include <include/user_interface/output.h>
 #include <include/utils/file_utils.h>
 #include <include/utils/zip_utils.h>
 #include <include/utils/yaml_utils.h>
@@ -21,23 +22,28 @@ void loadConfig() {
 		YAML::Node config = YAML::LoadFile("config.yml");
 
 		if (!config["cachePath"]) {
-			std::cerr << "Could not find cachePath in config.yml\n";
+			output::error("Could not find cachePath in config.yml\n");
 			return;
 		}
 		cachePath = config["cachePath"].as<std::string>();
 
 		if (!config["servers"]) {
-			std::cerr << "Could not find servers node in config.yml\n";
+			output::error("Could not find servers node in config.yml\n");
 			return;
 		}
 
-		std::cout << "|Loading servers\n";
+		std::cout << ANSI::Effects::BOLD << "Loading servers..\n" << ANSI::Effects::BOLD_RESET;
 		for (const auto& server : config["servers"]) {
-			servers.push_back(Server{ server.first.as<std::string>(), server.second.as<std::string>() });
+			try {
+				servers.push_back(Server{ server.first.as<std::string>(), server.second.as<std::string>() });
+			}
+			catch (int) {
+				std::cerr << "Skipping " << server.first.as<std::string>() << '\n';
+			}
 		}
 
 		if (!config["plugins"]) {
-			std::cerr << "Could not find plugins node in config.yml\n";
+			output::error("Could not find plugins node in config.yml\n");
 			return;
 		}
 
@@ -52,7 +58,8 @@ void loadConfig() {
 		}
 	}
 	catch (const YAML::Exception& e) {
-		std::cerr << "Yaml Error: " << e.what() << '\n';
+		std::cerr << ANSI::Effects::BOLD << ANSI::Foreground::RED
+			<< "Yaml Error: " << e.what() << ANSI::RESET << '\n';
 	}
 }
 
@@ -60,15 +67,16 @@ void init() {
 	loadConfig();
 
 	if (std::error_code e{}; !std::filesystem::exists(cachePath) && !std::filesystem::create_directories(cachePath, e)) {
-		std::cerr << "Could not create the cache directory: " << e.message() << "\nAborting..\n";
+		std::cerr << ANSI::Effects::BOLD << ANSI::Foreground::RED
+			<< "Could not create the cache directory: " << e.message() << "\nAborting..\n" << ANSI::RESET;
 		std::exit(1);
 	}
 
-	std::cout << "|Loading cache\n";
+	std::cout << ANSI::Effects::BOLD << "Loading cache..\n" << ANSI::Effects::BOLD_RESET;
 	//- Read cache
 	readPlugins(cachePath, cache);
 
-	std::cout << "|Fetching updates\n";
+	std::cout << ANSI::Effects::BOLD << "Fetching plugin updates..\n" << ANSI::Effects::BOLD_RESET;
 	for (auto& itr : cache) {
 		if (!itr.second.source) continue;
 		//- TODO: checks around here in case the update fails
@@ -93,23 +101,24 @@ int main() {
 	}
 
 	//- Show a summary first
-	std::cout << "|Summary\n";
+	std::cout << ANSI::Effects::BOLD << "Summary\n" << ANSI::Effects::BOLD_RESET;
 	for (const auto& server : servers) server.summary();
 
 	//- Ask for confirmation
-	if (std::cout << "Do you wish to continue? (y/n): "; input::get<char>() != 'y') {
-		std::cout << "Aborting..\n";
+	if (std::cout << ANSI::Effects::BOLD << "Continue? (y/n): "; input::get<char>() != 'y') {
+		std::cout << ANSI::RESET << "Aborting..\n";
 		exit(0);
 	}
 
 	//- Update
 	for (const auto& server : servers) {
-		std::cout << "|Updating " << server.name() << '\n';
+		std::cout << ANSI::Effects::BOLD << "Updating " << server.name() << ANSI::Effects::BOLD_RESET << '\n';
 		if (!server.update()) {
-			std::cerr << "Could not update " << server.name() << '\n';
+			std::cerr << ANSI::Effects::BOLD << ANSI::Foreground::RED
+				<< "Could not update " << server.name() << ANSI::RESET << '\n';
 		}
 	}
 
-	std::cout << "Done. Please restart the server(s) for the update to take effect.\n";
+	std::cout << "Done. Please restart the server(s) for the update to take effect.\n" << ANSI::RESET;
 	return 0;
 }

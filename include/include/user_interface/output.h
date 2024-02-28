@@ -1,11 +1,26 @@
 #pragma once
 
 #include <iostream>
+#include "ansi.h"
 
 namespace output {
 
    template<typename T> inline void print(const T& val) {
       std::cout << val;
+   }
+
+   /**
+    * Bright red error messages
+   */
+   template<typename T> inline void error(const T& val) {
+      std::cerr << ANSI::Effects::BOLD << ANSI::Foreground::RED << val << ANSI::RESET;
+   }
+
+   /**
+    * Bright yellow warn messages
+   */
+   template<typename T> inline void warn(const T& val) {
+      std::cerr << ANSI::Effects::BOLD << ANSI::Foreground::YELLOW << val << ANSI::RESET;
    }
 
    class ProgressBar {

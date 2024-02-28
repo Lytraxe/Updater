@@ -1,6 +1,7 @@
 #include <include/core/server.h>
 #include <include/core/cache.h>
 #include <include/utils/file_utils.h>
+#include <include/user_interface/ansi.h>
 
 #include <iostream>
 
@@ -40,17 +41,18 @@ const std::string& Server::directory() const {
 
 void Server::summary() const {
     int staged{ 0 };
-    std::cout << this->_name << " (" << this->_directory << ") : \n";
+    std::cout << ANSI::Foreground::YELLOW << this->_name << " (" << this->_directory << ") : \n";
     for (const auto& plugin : this->_localPlugins) {
         if (!plugin.second.staged) {
-            std::cout << '\t' << plugin.second.name << " (not staged)\n";
+            std::cout << '\t' << ANSI::Foreground::RED << plugin.second.name << " (not staged)\n";
             continue;
         }
-        std::cout << '\t' << plugin.second.name << '\t'
+        std::cout << '\t' << ANSI::Foreground::CYAN << plugin.second.name << '\t'
             << plugin.second.version << " -> " << plugin.second.update.tag << '\n';
         ++staged;
     }
-    std::cout << staged << " out of " << this->_localPlugins.size() << " plugins staged for update\n";
+    std::cout << ANSI::Foreground::CYAN << staged << ANSI::Foreground::YELLOW << " of " << ANSI::Foreground::CYAN
+        << this->_localPlugins.size() << ANSI::Foreground::YELLOW << " plugins staged for update\n" << ANSI::RESET;
 }
 
 bool Server::update() const {
@@ -58,16 +60,18 @@ bool Server::update() const {
     if (std::error_code er{}; !std::filesystem::exists(updatePath)
         && !std::filesystem::create_directories(updatePath, er)) {
 
-        std::cerr << "\tCould not create directory " << updatePath << ": " << er.message() << '\n';
+        std::cerr << ANSI::Foreground::RED << ANSI::Effects::BOLD << "\tCould not create directory " << updatePath << ": "
+            << er.message() << ANSI::RESET << '\n';
         return false;
     }
 
     for (const auto& itr : this->_localPlugins) {
         const auto& plugin = itr.second;
         if (!plugin.staged) continue;
-        
-        if (const auto err = copyFile(plugin.update.filePath, std::filesystem::path{updatePath}.append(plugin.update.fileName))) {
-            std::cerr << "\tCould not copy `" << plugin.name << "` to " << updatePath << ": " << err.message() << ". skipping..\n";
+
+        if (const auto err = copyFile(plugin.update.filePath, std::filesystem::path{ updatePath }.append(plugin.update.fileName))) {
+            std::cerr << ANSI::Foreground::RED << ANSI::Effects::BOLD << "\tCould not copy `" << plugin.name << "` to "
+                << updatePath << ": " << err.message() << ". skipping..\n" << ANSI::RESET;
             continue;
         }
     }

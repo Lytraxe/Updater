@@ -8,12 +8,17 @@
 
 #include <iostream>
 
+/**
+ * Reads .jar files inside the directory and populates `map`
+ * Throws int 111 if it couldnt read files at given directory
+*/
 void readPlugins(std::string& pluginPath, std::unordered_map<std::string, PluginInfo>& map) {
     std::vector<std::filesystem::path> jars{};
 
     auto err = getFiles(pluginPath, jars);
     if (err) {
         std::cerr << "Error occured while reading files at " << pluginPath << " (" + err.message() + ")\n";
+        throw 111;
         return;
     }
 
