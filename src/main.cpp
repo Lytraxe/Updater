@@ -17,19 +17,19 @@ std::vector<Server> servers{};
 std::string cachePath{};
 std::unordered_map<std::string, PluginInfo> cache{};
 
-void loadConfig() {
+bool loadConfig() {
 	try {
 		YAML::Node config = YAML::LoadFile("config.yml");
 
 		if (!config["cachePath"]) {
 			output::error("Could not find cachePath in config.yml\n");
-			return;
+			return false;
 		}
 		cachePath = config["cachePath"].as<std::string>();
 
 		if (!config["servers"]) {
 			output::error("Could not find servers node in config.yml\n");
-			return;
+			return false;
 		}
 
 		std::cout << ANSI::Effects::BOLD << "Loading servers..\n" << ANSI::Effects::BOLD_RESET;
@@ -44,7 +44,7 @@ void loadConfig() {
 
 		if (!config["plugins"]) {
 			output::error("Could not find plugins node in config.yml\n");
-			return;
+			return false;
 		}
 
 		for (const auto& plugin : config["plugins"]) {
@@ -56,15 +56,20 @@ void loadConfig() {
 
 			cache[info.name] = info;
 		}
+		return true;
 	}
 	catch (const YAML::Exception& e) {
 		std::cerr << ANSI::Effects::BOLD << ANSI::Foreground::RED
-			<< "Yaml Error: " << e.what() << ANSI::RESET << '\n';
+			<< "YamlError: " << e.what() << ANSI::RESET << '\n';
+		return false;
 	}
 }
 
 void init() {
-	loadConfig();
+	if (!loadConfig()) {
+		std::cerr << ANSI::Effects::BOLD << ANSI::Foreground::RED << "Invalid config.yml\n" << ANSI::RESET;
+		exit(1);
+	}
 
 	if (std::error_code e{}; !std::filesystem::exists(cachePath) && !std::filesystem::create_directories(cachePath, e)) {
 		std::cerr << ANSI::Effects::BOLD << ANSI::Foreground::RED
@@ -86,8 +91,6 @@ void init() {
 
 int main() {
 	init();
-
-	//- TODO: Better responses
 
 	//- Go through servers and look for updated plugins
 	for (auto& server : servers) {
